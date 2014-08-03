@@ -45,16 +45,16 @@ class DockerfileTest {
 
     @Test
     void createFromBase() {
-        assertThat(Dockerfile.fromBaseImage(BASE_IMAGE).instructions,
-                equalTo(["FROM ${BASE_IMAGE}"]))
+        assertThat(new Dockerfile(BASE_IMAGE).instructions,
+                equalTo(["FROM ${BASE_IMAGE}".toString()]))
     }
 
     @Test
     void createFromBaseAndAppend() {
-        def dockerfile = Dockerfile.fromBaseImage(BASE_IMAGE)
+        def dockerfile = new Dockerfile(BASE_IMAGE)
         dockerfile.append(MAINTAINER)
         assertThat(dockerfile.instructions,
-                equalTo(["FROM ${BASE_IMAGE}", MAINTAINER]))
+                equalTo(["FROM ${BASE_IMAGE}".toString(), MAINTAINER]))
     }
 
     @Test
@@ -86,7 +86,7 @@ class DockerfileTest {
     @Test
     void createFromFile() {
         File source = createTestDockerfile()
-        def dockerfile = Dockerfile.fromExternalFile(source)
+        def dockerfile = new Dockerfile(source)
         assertThat(dockerfile.instructions,
                 equalTo(INSTRUCTIONS))
     }
@@ -94,7 +94,7 @@ class DockerfileTest {
     @Test
     void createFromFileAndAppend() {
         File source = createTestDockerfile()
-        def dockerfile = Dockerfile.fromExternalFile(source)
+        def dockerfile = new Dockerfile(source)
         dockerfile.append(MAINTAINER)
         assertThat(dockerfile.instructions,
                 equalTo(INSTRUCTIONS + [MAINTAINER]))
