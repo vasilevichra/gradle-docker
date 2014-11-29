@@ -118,7 +118,19 @@ class Dockerfile {
     }
 
     void add(String source, String destination='/') {
-        add(resolvePath(source), destination)
+        if(isUrl(source)) {
+            this.append("ADD ${source} ${destination}")
+        } else if(isFile(source)) {
+            add(resolvePath(source), destination)
+        }
+    }
+
+    boolean isFile(String file) {
+        return resolvePath(file).exists()
+    }
+
+    private boolean isUrl(String url) {
+        return !resolvePath(url).exists()
     }
 
     void add(File source, String destination='/') {

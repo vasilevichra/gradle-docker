@@ -22,7 +22,6 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.is
 
-
 class DockerfileTest {
 
     public static final String BASE_IMAGE = 'ubuntu:14.04'
@@ -99,4 +98,32 @@ class DockerfileTest {
         assertThat(dockerfile.instructions,
                 equalTo(INSTRUCTIONS + [MAINTAINER]))
     }
-}
+
+    @Test
+    void addUrl() {
+        final Dockerfile dockerfile = new Dockerfile()
+        final String url = 'http://foo.bar/file.tar'
+
+        dockerfile.add url, '/target'
+        assertThat dockerfile.instructions, is(equalTo(["ADD ${url} /target".toString()]))
+    }
+
+
+    @Test
+    void addFile() {
+        final Dockerfile dockerfile = new Dockerfile()
+        final File file = new File('/tmp/adke')
+
+        dockerfile.add file, '/target'
+        assertThat dockerfile.instructions, is(equalTo(["ADD ${file.name} /target".toString()]))
+    }
+
+    @Test
+    void addFileAsString() {
+        final Dockerfile dockerfile = new Dockerfile()
+        final String file = '/tmp/asdrisd'
+
+        dockerfile.add file, '/target'
+        assertThat dockerfile.instructions, is(equalTo(["ADD ${file} /target".toString()]))
+    }
+ }
