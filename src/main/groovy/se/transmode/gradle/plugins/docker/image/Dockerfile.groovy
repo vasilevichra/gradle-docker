@@ -177,6 +177,11 @@ class Dockerfile {
         )
     }
 
+    /**
+     * Get the contents of the Dockerfile row by row as a list of strings.
+     *
+     * @return Dockerfile instructions as a list of Strings.
+     */
     List<String> getInstructions() {
         return (baseInstructions + instructions)*.toString()
     }

@@ -34,27 +34,29 @@ class DockerTask extends DockerTaskBase {
     // Whether or not to push the image into the registry (default: false)
     Boolean push
 
+    private Dockerfile dockerfile
+
+
     /**
      * Path to external Dockerfile
      */
-    File dockerfile
+    File externalDockerfile
     public void setDockerfile(String path) {
         setDockerfile(project.file(path))
     }
     public void setDockerfile(File dockerfile) {
-        this.dockerfile = dockerfile
+        this.externalDockerfile = dockerfile
+    }
+    public File getDockerfile() {
+        return this.externalDockerfile
     }
 
     /**
-     * Name of the base docker image
+     * Name of base docker image
     */
     String baseImage
-    public String getBaseImage() {
-        return determineBaseImage()
-    }
-
     /**
-     * Determine the name of the base docker image.
+     * Determine the base docker image.
      *
      * If the base image is set in the task, return it. Otherwise return the base image
      * defined in the 'docker' extension. If the extension base image is not set determine
@@ -62,10 +64,11 @@ class DockerTask extends DockerTaskBase {
      *
      * @return Name of base docker image
      */
-    private String determineBaseImage() {
+    public String getBaseImage() {
         def defaultImage = project.hasProperty('targetCompatibility') ? JavaBaseImage.imageFor(project.targetCompatibility).imageName : DEFAULT_IMAGE
         return baseImage ?: (project[DockerPlugin.EXTENSION_NAME].baseImage ?: defaultImage)
     }
+
 
     // Dockerfile instructions (ADD, RUN, etc.)
     def instructions
@@ -77,6 +80,7 @@ class DockerTask extends DockerTaskBase {
     DockerTask() {
         instructions = []
         stageBacklog = []
+        dockerfile = new Dockerfile()
         stageDir = new File(project.buildDir, "docker")
     }
 
@@ -161,13 +165,15 @@ class DockerTask extends DockerTaskBase {
         this.setEntryPoint(entryPoint)
     }
 
+    @Deprecated
     void setDefaultCommand(List cmd) {
-        instructions.add('CMD ["' + cmd.join('", "') + '"]')
+        logger.lifecycle('The setDefaultCommand method is deprecated, use dockerfile.cmd instead.')
+        dockerfile.cmd(cmd)
     }
 
-    void defaultCommand(List cmd) {
-        this.setDefaultCommand(cmd)
-    }
+//    void defaultCommand(List cmd) {
+//        this.setDefaultCommand(cmd)
+//    }
 
     void contextDir(String contextDir) {
         stageDir = new File(stageDir, contextDir)
@@ -188,7 +194,6 @@ class DockerTask extends DockerTaskBase {
 
     @VisibleForTesting
     protected Dockerfile buildDockerfile() {
-        def baseDockerfile
         if (getDockerfile()) {
             logger.info('Creating Dockerfile from file {}.', dockerfile)
             baseDockerfile = new Dockerfile(dockerfile,
@@ -202,9 +207,9 @@ class DockerTask extends DockerTaskBase {
                     { -> project.copy(it) })
         }
         if (getMaintainer()) {
-            baseDockerfile.append("MAINTAINER ${getMaintainer()}")
+            dockerfile.maintainer(getMaintainer())
         }
-        return baseDockerfile.appendAll(instructions)
+        return dockerfile.appendAll(instructions)
     }
 
     @TaskAction
