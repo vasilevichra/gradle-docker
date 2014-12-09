@@ -89,6 +89,7 @@ class Dockerfile {
      * Example: foo('bar', 42) becomes "FOO bar 42"
      */
     def methodMissing(String name, args) {
+        // fixme: check for case insensitive method name match before falling back to default method
         log.debug('No method for "{}({})" found. Falling back on default method.', name, args.join(', '))
         this.append("${name.toUpperCase()} ${args.join(' ')}")
     }
@@ -182,5 +183,14 @@ class Dockerfile {
      */
     List<String> getInstructions() {
         return (baseInstructions + instructions)*.toString()
+    }
+
+    /**
+     * Return true if base image or dockerfile has been defined.
+     *
+     * @return Boolean true if base is set
+     */
+    Boolean hasBase() {
+        return baseInstructions.size() > 0
     }
 }

@@ -35,6 +35,7 @@ class DockerTask extends DockerTaskBase {
     Boolean push
 
     Dockerfile dockerfile
+    File externalDockerfile
 
     public void dockerfile(Closure closure) {
         dockerfile.with(closure)
@@ -44,13 +45,13 @@ class DockerTask extends DockerTaskBase {
     /**
      * Path to external Dockerfile
      */
-    File externalDockerfile
-//    public void setDockerfile(String path) {
-//        setDockerfile(project.file(path))
-//    }
-//    public void setDockerfile(File dockerfile) {
-//        this.externalDockerfile = dockerfile
-//    }
+    public void setDockerfile(String path) {
+        dockerfile(project.file(path))
+    }
+    public void setDockerfile(File baseFile) {
+        logger.info('Creating Dockerfile from file {}.', baseFile)
+        dockerfile.from(baseFile)
+    }
 
     /**
      * Name of base docker image
@@ -196,10 +197,7 @@ class DockerTask extends DockerTaskBase {
 
     @VisibleForTesting
     protected Dockerfile buildDockerfile() {
-        if (externalDockerfile) {
-            logger.info('Creating Dockerfile from file {}.', dockerfile)
-            dockerfile.from(externalDockerfile)
-        } else {
+        if (!dockerfile.hasBase()) {
             def baseImage = getBaseImage()
             logger.info('Creating Dockerfile from base {}.', baseImage)
             dockerfile.from(baseImage)
