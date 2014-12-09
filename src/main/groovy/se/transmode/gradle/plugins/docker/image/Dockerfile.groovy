@@ -41,30 +41,28 @@ class Dockerfile {
     }
 
     // fixme: do we really need a no-args constructor?
-    Dockerfile() {
+    Dockerfile(resolvePathLambda={ -> this.resolvePath(it)}, copyLambda={ -> this.copy(it)}) {
         this.baseInstructions = []
         this.instructions = []
         this.contextDir
         this.stagingBacklog = []
+        this.resolvePathLamba = resolvePathLambda
+        this.copyLambda = copyLambda
     }
 
     Dockerfile(String base,
                resolvePathLambda={ -> this.resolvePath(it)}, copyLambda={ -> this.copy(it)}) {
-        this()
+        this(resolvePathLambda, copyLambda)
         from base
-        this.resolvePathLamba = resolvePathLambda
-        this.copyLambda = copyLambda
     }
 
     Dockerfile(File externalDockerfile,
                resolvePathLambda={ -> this.resolvePath(it)}, copyLambda={ -> this.copy(it)}) {
-        this()
+        this(resolvePathLambda, copyLambda)
         if(externalDockerfile.isFile()) {
             this.contextDir = externalDockerfile.parentFile
         }
         from externalDockerfile
-        this.resolvePathLamba = resolvePathLambda
-        this.copyLambda = copyLambda
     }
 
     Dockerfile append(def instruction) {

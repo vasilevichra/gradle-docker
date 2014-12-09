@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 package se.transmode.gradle.plugins.docker
-
-import org.junit.Ignore
-import org.junit.Test
-import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.api.Project
-import static org.junit.Assert.*
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Test
+
 import static org.hamcrest.Matchers.*
+import static org.junit.Assert.assertThat
 
 
 class CreateDockerfileTest {
@@ -49,7 +48,6 @@ class CreateDockerfileTest {
         assertThat actualDockerFile, is(equalTo(expectedDockerFile))
     }
 
-    @Ignore
     @Test
     public void compareDockerfileBuiltWithDSL() {
         Project project = ProjectBuilder.builder().build()
@@ -60,10 +58,7 @@ class CreateDockerfileTest {
         // don't actually execute docker, just build Dockerfile
         task.dockerBinary = "/bin/true"
 
-        // example pulled from "http://docs.docker.io/en/latest/use/builder/#dockerfile-examples"
-        task.baseImage "ubuntu"
         task.maintainer 'Guillaume J. Charmes "guillaume@dotcloud.com"'
-
         task.dockerfile {
             from 'ubuntu'
             run 'echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list'
@@ -71,10 +66,12 @@ class CreateDockerfileTest {
             run 'apt-get install -y inotify-tools nginx apache2 openssh-server'
         }
 
-        def expectedDockerFile = this.getClass().getResource("nginx.Dockerfile").text.trim()
-        def actualDockerFile = task.buildDockerfile().instructions.join(System.getProperty('line.separator'))
+        def expected = []
+        this.getClass().getResource("nginx.Dockerfile").eachLine { expected << it }
+        def actual = task.buildDockerfile().instructions
 
-        assertThat actualDockerFile, is(equalTo(expectedDockerFile))
+        assertThat actual[0], equalToIgnoringCase('from ubuntu')
+        assertThat actual, containsInAnyOrder(*expected)
     }
 }
 

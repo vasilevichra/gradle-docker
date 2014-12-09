@@ -34,22 +34,23 @@ class DockerTask extends DockerTaskBase {
     // Whether or not to push the image into the registry (default: false)
     Boolean push
 
-    private Dockerfile dockerfile
+    Dockerfile dockerfile
+
+    public void dockerfile(Closure closure) {
+        dockerfile.with(closure)
+    }
 
 
     /**
      * Path to external Dockerfile
      */
     File externalDockerfile
-    public void setDockerfile(String path) {
-        setDockerfile(project.file(path))
-    }
-    public void setDockerfile(File dockerfile) {
-        this.externalDockerfile = dockerfile
-    }
-    public File getDockerfile() {
-        return this.externalDockerfile
-    }
+//    public void setDockerfile(String path) {
+//        setDockerfile(project.file(path))
+//    }
+//    public void setDockerfile(File dockerfile) {
+//        this.externalDockerfile = dockerfile
+//    }
 
     /**
      * Name of base docker image
@@ -80,7 +81,7 @@ class DockerTask extends DockerTaskBase {
     DockerTask() {
         instructions = []
         stageBacklog = []
-        dockerfile = new Dockerfile()
+        dockerfile = new Dockerfile({ -> project.file(it) }, { -> project.copy(it) })
         stageDir = new File(project.buildDir, "docker")
     }
 
@@ -195,17 +196,13 @@ class DockerTask extends DockerTaskBase {
 
     @VisibleForTesting
     protected Dockerfile buildDockerfile() {
-        if (getDockerfile()) {
+        if (externalDockerfile) {
             logger.info('Creating Dockerfile from file {}.', dockerfile)
-            dockerfile = new Dockerfile(getDockerfile(),
-                    { -> project.file(it) },
-                    { -> project.copy(it) })
+            dockerfile.from(externalDockerfile)
         } else {
             def baseImage = getBaseImage()
             logger.info('Creating Dockerfile from base {}.', baseImage)
-            dockerfile = new Dockerfile(baseImage,
-                    { -> project.file(it) },
-                    { -> project.copy(it) })
+            dockerfile.from(baseImage)
         }
         if (getMaintainer()) {
             dockerfile.maintainer(getMaintainer())
