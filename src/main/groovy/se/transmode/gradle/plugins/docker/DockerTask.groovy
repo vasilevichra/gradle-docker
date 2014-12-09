@@ -56,7 +56,7 @@ class DockerTask extends DockerTaskBase {
     */
     String baseImage
     /**
-     * Determine the base docker image.
+     * Return the base docker image.
      *
      * If the base image is set in the task, return it. Otherwise return the base image
      * defined in the 'docker' extension. If the extension base image is not set determine
@@ -196,13 +196,13 @@ class DockerTask extends DockerTaskBase {
     protected Dockerfile buildDockerfile() {
         if (getDockerfile()) {
             logger.info('Creating Dockerfile from file {}.', dockerfile)
-            baseDockerfile = new Dockerfile(dockerfile,
+            dockerfile = new Dockerfile(externalDockerfile,
                     { -> project.file(it) },
                     { -> project.copy(it) })
         } else {
-            def baseImage = determineBaseImage()
+            def baseImage = getBaseImage()
             logger.info('Creating Dockerfile from base {}.', baseImage)
-            baseDockerfile = new Dockerfile(baseImage,
+            dockerfile = new Dockerfile(baseImage,
                     { -> project.file(it) },
                     { -> project.copy(it) })
         }
