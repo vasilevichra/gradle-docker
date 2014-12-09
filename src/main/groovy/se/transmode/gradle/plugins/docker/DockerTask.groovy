@@ -167,13 +167,14 @@ class DockerTask extends DockerTaskBase {
 
     @Deprecated
     void setDefaultCommand(List cmd) {
-        logger.lifecycle('The setDefaultCommand method is deprecated, use dockerfile.cmd instead.')
+        logger.warn('The setDefaultCommand method thas been deprecated and is scheduled to be removed. Use dockerfile.cmd instead.')
         dockerfile.cmd(cmd)
     }
 
-//    void defaultCommand(List cmd) {
-//        this.setDefaultCommand(cmd)
-//    }
+    @Deprecated
+    void defaultCommand(List cmd) {
+        this.setDefaultCommand(cmd)
+    }
 
     void contextDir(String contextDir) {
         stageDir = new File(stageDir, contextDir)
@@ -196,7 +197,7 @@ class DockerTask extends DockerTaskBase {
     protected Dockerfile buildDockerfile() {
         if (getDockerfile()) {
             logger.info('Creating Dockerfile from file {}.', dockerfile)
-            dockerfile = new Dockerfile(externalDockerfile,
+            dockerfile = new Dockerfile(getDockerfile(),
                     { -> project.file(it) },
                     { -> project.copy(it) })
         } else {
