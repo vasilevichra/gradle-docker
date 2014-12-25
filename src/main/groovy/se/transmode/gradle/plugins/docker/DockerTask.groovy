@@ -37,6 +37,9 @@ class DockerTask extends DockerTaskBase {
     Dockerfile dockerfile
     File externalDockerfile
 
+    @Delegate(deprecated=true)
+    LegacyDockerfileMethods legacyMethods
+
     public void dockerfile(Closure closure) {
         dockerfile.with(closure)
     }
@@ -84,6 +87,7 @@ class DockerTask extends DockerTaskBase {
         stageBacklog = []
         dockerfile = new Dockerfile({ -> project.file(it) }, { -> project.copy(it) })
         stageDir = new File(project.buildDir, "docker")
+        legacyMethods = new LegacyDockerfileMethods(dockerfile)
     }
 
     void addFile(String source, String destination='/') {
@@ -165,35 +169,6 @@ class DockerTask extends DockerTaskBase {
 
     void entryPoint(List entryPoint) {
         this.setEntryPoint(entryPoint)
-    }
-
-    @Deprecated
-    /**
-     * Set the default command of the Docker image ('CMD' in Dockerfile). Deprecated.
-     *
-     * Use the new dockerfile API instead:
-     *   dockerfile {
-     *     cmd 'your-command'
-     *   }
-     *
-     */
-    void setDefaultCommand(List cmd) {
-        logger.warn('The setDefaultCommand method has been deprecated and is scheduled to be removed. Use dockerfile.cmd instead.')
-        dockerfile.cmd(cmd)
-    }
-
-    @Deprecated
-    /**
-     * Set the default command of the Docker image ('CMD' in Dockerfile). Deprecated.
-     *
-     * Use the new dockerfile API instead:
-     *   dockerfile {
-     *     cmd 'your-command'
-     *   }
-     *
-     */
-    void defaultCommand(List cmd) {
-        this.setDefaultCommand(cmd)
     }
 
     void contextDir(String contextDir) {
