@@ -19,6 +19,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
 import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.containsInAnyOrder
 import static org.junit.Assert.assertThat
 
 
@@ -42,11 +43,14 @@ class CreateDockerfileTest {
 
         task.runCommand "apt-get install -y inotify-tools nginx apache2 openssh-server"
 
-        def expectedDockerFile = this.getClass().getResource("nginx.Dockerfile").text.trim()
-        def actualDockerFile = task.buildDockerfile().instructions.join(System.getProperty('line.separator'))
+        task.defaultCommand(["/bin/bash"])
 
-        assertThat actualDockerFile, is(equalTo(expectedDockerFile))
-    }
+        def expected = []
+        this.getClass().getResource("nginx.Dockerfile").eachLine { expected << it }
+        def actual = task.buildDockerfile().instructions
+
+        assertThat actual[0], equalToIgnoringCase('from ubuntu')
+        assertThat actual, containsInAnyOrder(*expected)    }
 
     @Test
     public void compareDockerfileBuiltWithDSL() {
@@ -64,6 +68,7 @@ class CreateDockerfileTest {
             run 'echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list'
             run 'apt-get update'
             run 'apt-get install -y inotify-tools nginx apache2 openssh-server'
+            cmd(['/bin/bash'])
         }
 
         def expected = []
