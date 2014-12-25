@@ -168,12 +168,30 @@ class DockerTask extends DockerTaskBase {
     }
 
     @Deprecated
+    /**
+     * Set the default command of the Docker image ('CMD' in Dockerfile). Deprecated.
+     *
+     * Use the new dockerfile API instead:
+     *   dockerfile {
+     *     cmd 'your-command'
+     *   }
+     *
+     */
     void setDefaultCommand(List cmd) {
-        logger.warn('The setDefaultCommand method thas been deprecated and is scheduled to be removed. Use dockerfile.cmd instead.')
+        logger.warn('The setDefaultCommand method has been deprecated and is scheduled to be removed. Use dockerfile.cmd instead.')
         dockerfile.cmd(cmd)
     }
 
     @Deprecated
+    /**
+     * Set the default command of the Docker image ('CMD' in Dockerfile). Deprecated.
+     *
+     * Use the new dockerfile API instead:
+     *   dockerfile {
+     *     cmd 'your-command'
+     *   }
+     *
+     */
     void defaultCommand(List cmd) {
         this.setDefaultCommand(cmd)
     }
