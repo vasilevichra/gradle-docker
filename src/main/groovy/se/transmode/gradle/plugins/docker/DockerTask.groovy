@@ -159,6 +159,7 @@ class DockerTask extends DockerTaskBase {
             logger.info('Creating Dockerfile from base {}.', baseImage)
             dockerfile.from(baseImage)
         }
+        // fixme: only add maintainer if not already set in external dockerfile or via dockerfile.maintainer
         if (getMaintainer()) {
             dockerfile.maintainer(getMaintainer())
         }
