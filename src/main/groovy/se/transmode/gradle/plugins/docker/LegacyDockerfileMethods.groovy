@@ -81,7 +81,7 @@ class LegacyDockerfileMethods implements GroovyInterceptable {
      */
     @Deprecated
     void exposePort(Integer port) {
-        dockerfile.port(port)
+        dockerfile.expose(port)
     }
 
     /**
