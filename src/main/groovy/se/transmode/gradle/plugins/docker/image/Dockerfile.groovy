@@ -90,7 +90,7 @@ class Dockerfile {
      */
     def methodMissing(String name, args) {
         // fixme: check for case insensitive method name match before falling back to default method
-        log.debug('No method for "{}({})" found. Falling back on default method.', name, args.join(', '))
+        log.debug('No explicit method declaration for "{}({})" found. Using default implementation.', name, args.join(', '))
         this.append("${name.toUpperCase()} ${args.join(' ')}")
     }
 
