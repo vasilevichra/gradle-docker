@@ -135,42 +135,6 @@ class DockerTask extends DockerTaskBase {
         )
     }
 
-    void workingDir(String wd) {
-        instructions.add("WORKDIR ${wd}")
-    }
-
-    void addInstruction(String cmd, String value) {
-        instructions.add("${cmd} ${value}")
-    }
-
-    void runCommand(String command) {
-        instructions.add("RUN ${command}")
-    }
-
-    void exposePort(Integer port) {
-        instructions.add("EXPOSE ${port}")
-    }
-
-    void switchUser(String userName) {
-        instructions.add("USER ${userName}")
-    }
-
-    void setEnvironment(String key, String value) {
-        instructions.add("ENV ${key} ${value}")
-    }
-
-    void volume(String... paths) {
-        instructions.add('VOLUME ["' + paths.join('", "') + '"]')
-    }
-
-    void setEntryPoint(List entryPoint) {
-        instructions.add('ENTRYPOINT ["' + entryPoint.join('", "') + '"]')
-    }
-
-    void entryPoint(List entryPoint) {
-        this.setEntryPoint(entryPoint)
-    }
-
     void contextDir(String contextDir) {
         stageDir = new File(stageDir, contextDir)
     }
