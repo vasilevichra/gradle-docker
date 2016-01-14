@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 package se.transmode.gradle.plugins.docker
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Files
 
+import com.google.common.annotations.VisibleForTesting
+import com.google.common.io.Files
 import org.gradle.api.DefaultTask
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskAction
-
 import se.transmode.gradle.plugins.docker.client.DockerClient
 import se.transmode.gradle.plugins.docker.client.JavaDockerClient
 import se.transmode.gradle.plugins.docker.client.NativeDockerClient
@@ -88,7 +87,7 @@ class DockerTask extends DefaultTask {
     File stageDir
     // Tasks necessary to setup the stage before building an image
     def stageBacklog
-    
+
     // Should we use Docker's remote API instead of the docker executable
     Boolean useApi
     // URL of the remote Docker host (default: localhost)
@@ -106,6 +105,10 @@ class DockerTask extends DefaultTask {
     }
 
     void addFile(String source, String destination='/') {
+        addFile(project.file(source), destination)
+    }
+
+    void addFile(URL source, String destination='/') {
         addFile(project.file(source), destination)
     }
 
@@ -207,7 +210,7 @@ class DockerTask extends DefaultTask {
             dir.mkdirs()
         return dir
     }
-    
+
     @VisibleForTesting
     protected void setupStageDir() {
         logger.info('Setting up staging directory.')
